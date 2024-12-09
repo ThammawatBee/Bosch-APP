@@ -1,25 +1,20 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-
+import { Box, Text } from '@chakra-ui/react';
+import EquipmentPage from './EquipmentListPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+{/* <Box minHeightheight="100vh"></Box> */ }
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box>
+      <ToastContainer />
+      <Box bg='#000000' width="100%" padding="4" color="white">
+        <Text>Equipment List</Text>
+      </Box>
+      <Box paddingLeft="10%" paddingRight="10%" paddingTop="2.5%" paddingBottom="2.5%">
+        <EquipmentPage />
+      </Box>
+    </Box>
   );
 }
 
