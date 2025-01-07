@@ -27,7 +27,7 @@ const ReportPage = () => {
   const [uploadLoading, setUploadLoading] = useState(false)
 
   const handleExportReport = async () => {
-    const apiUrl = 'http://localhost:3001/reports/export'; // Replace with your API endpoint
+    const apiUrl = `${process.env.REACT_APP_SERVICE_URL}/reports/export`; // Replace with your API endpoint
     setExportLoading(true)
     try {
       const response = await axios.get(apiUrl, {

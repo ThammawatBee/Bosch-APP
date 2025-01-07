@@ -48,7 +48,7 @@ const EquipmentPage = () => {
   });
 
   const handleExportEquipment = async () => {
-    const apiUrl = 'http://localhost:3001/equipments/export'; // Replace with your API endpoint
+    const apiUrl = `${process.env.REACT_APP_SERVICE_URL}/equipments/export`; // Replace with your API endpoint
     setExportLoading(true)
     try {
       const response = await axios.get(apiUrl, {
