@@ -24,7 +24,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
   const { createEquipment, editEquipment } = useEquipmentStore()
 
   const getEquipmentNumberPrefix = () => {
-    return `${DateTime.now().toFormat('ddMMyyyy')}-`
+    return selectedEquipment ? `${selectedEquipment.equipmentNumber.split('-')[0]}-` : `${DateTime.now().toFormat('ddMMyy')}-`
   }
 
   const successToast = (message: string) => {
@@ -53,7 +53,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
       status: 'ENABLE'
     },
     validationSchema: Yup.object({
-      equipmentNumber: Yup.string().required('Equipment No. is required.'),
+      equipmentNumber: Yup.string().matches(/^[A-Z][0-9]{3}$/, 'equipment number must start with an uppercase letter followed by three digits.').required('Equipment No. is required.'),
       brand: Yup.string().required('Band is required.'),
       name: Yup.string().required('Name is required.'),
       inspectionPeriod: Yup.number().nullable().required("Inspection period is required."),
@@ -83,6 +83,9 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
             name: value.name,
             nextInspection: value.nextInspection,
             expiredDate: value.expiredDate,
+            inspectionPeriod: +value.inspectionPeriod,
+            status: value.status,
+            equipmentNumber: `${getEquipmentNumberPrefix()}${value.equipmentNumber}`
           })
           successToast("Edit equipment success")
         } else {
@@ -92,6 +95,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
         setOpenDialog(false)
       } catch (error: any) {
         const errorData = error.data as ServiceError
+        console.log('errorData.errorKey', errorData.errorKey)
         if (errorData.errorKey === 'EQUIPMENT_NUMBER_IS_ALREADY_EXIST') {
           toast.error('Equipment number is already exist', {
             style: { color: '#18181B' },
@@ -104,7 +108,20 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
             progress: undefined,
             theme: "light",
           });
-        } else {
+        } else if (errorData.errorKey === 'EQUIPMENT_IS_ALREADY_GENERATE_REPORT') {
+          toast.error('Equipment is already generated report', {
+            style: { color: '#18181B' },
+            position: "top-right",
+            autoClose: 3500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
+        else {
           toast.error('Create or edit equipment error,please try again', {
             style: { color: '#18181B' },
             position: "top-right",
@@ -124,7 +141,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
   useEffect(() => {
     if (selectedEquipment) {
       formik.setValues({
-        equipmentNumber: selectedEquipment.equipmentNumber,
+        equipmentNumber: selectedEquipment.equipmentNumber.split('-')[1],
         type: selectedEquipment.type,
         brand: selectedEquipment.brand,
         name: selectedEquipment.name,
@@ -140,7 +157,6 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
   const renderDisabledInput = (key: string) => {
     return <Input value={formik.values?.[key]} disabled />
   }
-
   return <DialogRoot size={"lg"} closeOnInteractOutside={false} onExitComplete={() => {
     formik.resetForm()
     setSelectedDate(null)
@@ -149,7 +165,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
     <DialogContent>
       <form onSubmit={formik.handleSubmit}>
         <DialogHeader>
-          <DialogTitle>Add new</DialogTitle>
+          <DialogTitle>{selectedEquipment ? 'Edit Equipment' : 'Add new'}</DialogTitle>
         </DialogHeader>
         <DialogBody>
           <Field label="Type" marginBottom={'10px'}>
@@ -164,7 +180,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
                       formik.setFieldValue("type", e.currentTarget.value)
                       if (e.currentTarget.value === "External" && formik.values.inspectionPeriod !== 3) {
                         formik.setFieldValue("inspectionPeriod", 3)
-                        formik.setFieldValue("nextInspection", DateTime.now().plus({ months: Number(e.currentTarget.value) }).toFormat("dd-MM-yyyy"))
+                        formik.setFieldValue("nextInspection", DateTime.now().plus({ months: Number(e.currentTarget.value) }).minus({ days: 1 }).toFormat("dd-MM-yyyy"))
                         if (formik.errors.inspectionPeriod) {
                           formik.setFieldTouched("inspectionPeriod", false)
                           formik.setFieldTouched("nextInspection", false)
@@ -183,7 +199,6 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
             <Input name="equipmentNumber"
               value={`${getEquipmentNumberPrefix()}${formik?.values?.equipmentNumber}`}
               onBlur={formik.handleBlur}
-              disabled={!!selectedEquipment}
               onChange={e => {
                 if (e.currentTarget.value !== getEquipmentNumberPrefix().slice(0, -1)) {
                   formik.setFieldValue("equipmentNumber", e.currentTarget.value.replace(getEquipmentNumberPrefix(), ""))
@@ -198,29 +213,27 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
             <Input value={formik?.values?.brand} onBlur={formik.handleBlur} onChange={e => { formik.setFieldValue("brand", e.currentTarget.value) }} />
           </Field>
           <Field label="Inspection Period" marginBottom={'10px'} invalid={!!formik.touched.inspectionPeriod && !!formik.errors.inspectionPeriod} errorText={formik.errors.inspectionPeriod}>
-            {
-              selectedEquipment ? renderDisabledInput("inspectionPeriod") : <NativeSelectRoot>
-                <NativeSelectField
-                  placeholder="Select Inspection Period"
-                  value={formik.values.inspectionPeriod || 0}
-                  onChange={(e) => {
-                    if (e.currentTarget.value) {
-                      formik.setFieldValue("inspectionPeriod", e.currentTarget.value)
-                      formik.setFieldValue("nextInspection", DateTime.now().plus({ months: Number(e.currentTarget.value) }).toFormat("dd-MM-yyyy"))
-                      if (formik.errors.inspectionPeriod) {
-                        formik.setFieldTouched("inspectionPeriod", false)
-                        formik.setFieldTouched("nextInspection", false)
-                      }
+            <NativeSelectRoot>
+              <NativeSelectField
+                placeholder="Select Inspection Period"
+                value={formik.values.inspectionPeriod || 0}
+                onChange={(e) => {
+                  if (e.currentTarget.value) {
+                    formik.setFieldValue("inspectionPeriod", e.currentTarget.value)
+                    formik.setFieldValue("nextInspection", DateTime.now().plus({ months: Number(e.currentTarget.value) }).minus({ days: 1 }).toFormat("dd-MM-yyyy"))
+                    if (formik.errors.inspectionPeriod) {
+                      formik.setFieldTouched("inspectionPeriod", false)
+                      formik.setFieldTouched("nextInspection", false)
                     }
-                  }}
-                  name="inspectionPeriod"
-                  onBlur={formik.handleBlur}
-                >
-                  <option value={3}>3 Month</option>
-                  {formik.values.type === "BOSCH" && [<option value={12}>12 Month</option>, <option value={24}>24 Month</option>]}
-                </NativeSelectField>
-              </NativeSelectRoot>
-            }
+                  }
+                }}
+                name="inspectionPeriod"
+                onBlur={formik.handleBlur}
+              >
+                <option value={3}>3 Month</option>
+                {formik.values.type === "BOSCH" && [<option value={12}>12 Month</option>, <option value={24}>24 Month</option>]}
+              </NativeSelectField>
+            </NativeSelectRoot>
           </Field>
           <Field label="Next Inspection" marginBottom={'10px'} invalid={!!formik.touched.nextInspection && !!formik.errors.nextInspection} errorText={formik.errors.nextInspection}>
             <Input value={formik?.values?.nextInspection} disabled variant="subtle" />
@@ -248,18 +261,17 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
             />
           </Field>
           <Field label="Status" marginBottom={'10px'}>
-            {selectedEquipment ? renderDisabledInput("status") :
-              <NativeSelectRoot disabled={!!selectedEquipment}>
-                <NativeSelectField
-                  placeholder="Status"
-                  value={formik.values.status}
-                  onChange={(e) => formik.setFieldValue("status", e.currentTarget.value)}
-                  name="status"
-                >
-                  <option value={"ENABLE"}>Enable</option>
-                  <option value={"DISABLE"}>Disable</option>
-                </NativeSelectField>
-              </NativeSelectRoot>}
+            <NativeSelectRoot disabled={!!selectedEquipment}>
+              <NativeSelectField
+                placeholder="Status"
+                value={formik.values.status}
+                onChange={(e) => formik.setFieldValue("status", e.currentTarget.value)}
+                name="status"
+              >
+                <option value={"ENABLE"}>Enable</option>
+                <option value={"DISABLE"}>Disable</option>
+              </NativeSelectField>
+            </NativeSelectRoot>
           </Field>
         </DialogBody>
         <DialogFooter>

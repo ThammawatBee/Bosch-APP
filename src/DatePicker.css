@@ -1,0 +1,37 @@
+.react-datepicker-wrapper{
+  width: 100%;
+}
+
+.react-datepicker__day--selected {
+  background-color: #27272a !important; /* Your desired color */
+  color: white !important; /* Adjust text color for contrast */
+}
+
+.react-datepicker__day--keyboard-selected{
+  background-color: #5f5f68 !important; /* Your desired color */
+  color: white !important; /* Adjust text color for contrast */
+}
+
+
+
+/* Dates in range background */
+.react-datepicker__day--in-range {
+  background-color: #27272a !important; /* Your desired color */
+  color: white !important; /* Adjust text color for contrast */
+}
+
+/* Optional: Hover effects for dates in range */
+.react-datepicker__day--in-range:hover {
+  background-color: #18181b !important; /* Slightly darker shade for hover */
+  color: white !important; /* Adjust text color for contrast */
+}
+
+.react-datepicker__day--in-selecting-range{
+  background-color: #71717a !important; 
+  color: white !important; /* Adjust text color for contrast */
+}
+
+.react-datepicker__close-icon::after{
+  background-color:#18181b !important;
+  padding-bottom: 4px !important;
+}
