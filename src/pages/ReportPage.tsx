@@ -104,11 +104,11 @@ const ReportPage = () => {
   }
 
 
-  return <Box>
+  return <Box backgroundColor={'white'} padding="20px" borderRadius={'8px'}>
     <Text color="#3D4D99" fontWeight="bold" textStyle="lg" mb="15px">Result Report</Text>
     <Box mt="10px" display="flex" mb="15px" justifyContent='space-between'>
       <Field label="Result" width="18%">
-        <NativeSelectRoot background={'white'} borderRadius={'4px'}>
+        <NativeSelectRoot background={'white'} borderRadius={'8px'}>
           <NativeSelectField
             placeholder="All Result"
             value={search?.status}
@@ -120,7 +120,7 @@ const ReportPage = () => {
         </NativeSelectRoot>
       </Field>
       <Field label="Type" width="18%">
-        <NativeSelectRoot background={'white'} borderRadius={'4px'}>
+        <NativeSelectRoot background={'white'} borderRadius={'8px'}>
           <NativeSelectField
             placeholder="All type"
             value={search?.type}

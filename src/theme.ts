@@ -10,5 +10,7 @@ const theme = createSystem(defaultConfig, {
     },
   },
 })
+console.log('defaultConfig', defaultConfig)
+console.log('theme', theme)
 
 export default theme;

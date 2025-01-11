@@ -1,4 +1,4 @@
-import { Button, Input, NativeSelectField, NativeSelectRoot } from "@chakra-ui/react"
+import { Input, NativeSelectField, NativeSelectRoot } from "@chakra-ui/react"
 import { DialogActionTrigger, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle } from "./ui/dialog"
 import { Field } from "./ui/field"
 import { useFormik } from "formik"
@@ -11,6 +11,7 @@ import { Equipment } from "@/interface/CreateEquipmentForm"
 import { ServiceError } from "@/interface/Error"
 import { toast } from "react-toastify"
 import useEquipmentStore from "../store/equipmentStore"
+import { Button } from "./ui/button"
 
 
 interface EquipmentFormDialogProps {
@@ -178,9 +179,9 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
                   onChange={(e) => {
                     if (e.currentTarget.value) {
                       formik.setFieldValue("type", e.currentTarget.value)
-                      if (e.currentTarget.value === "External" && formik.values.inspectionPeriod !== 3) {
+                      if (e.currentTarget.value === "EXTERNAL" && formik.values.inspectionPeriod !== 3) {
                         formik.setFieldValue("inspectionPeriod", 3)
-                        formik.setFieldValue("nextInspection", DateTime.now().plus({ months: Number(e.currentTarget.value) }).minus({ days: 1 }).toFormat("dd-MM-yyyy"))
+                        formik.setFieldValue("nextInspection", DateTime.now().plus({ months: Number(3) }).minus({ days: 1 }).toFormat("dd-MM-yyyy"))
                         if (formik.errors.inspectionPeriod) {
                           formik.setFieldTouched("inspectionPeriod", false)
                           formik.setFieldTouched("nextInspection", false)

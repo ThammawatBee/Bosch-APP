@@ -77,12 +77,12 @@ const EquipmentPage = () => {
     }
   }
 
-  return <Box>
+  return <Box backgroundColor={'white'} padding="20px" borderRadius={'8px'}>
     <Box>
       <Text color="#3D4D99" fontWeight="bold" textStyle="lg" mb="15px">Equipment List</Text>
       <Box mt="10px" display="flex" mb="10px" justifyContent='space-between'>
         <Field label="Type" width="18%">
-          <NativeSelectRoot background={'white'} borderRadius={'4px'}>
+          <NativeSelectRoot background={'white'} borderRadius={'8px'}>
             <NativeSelectField
               placeholder="All type"
               value={search?.type}
@@ -120,7 +120,7 @@ const EquipmentPage = () => {
             }} />
         </Field>
         <Field label="Status" width="18%">
-          <NativeSelectRoot background={'white'} borderRadius={'4px'}>
+          <NativeSelectRoot background={'white'} borderRadius={'8px'}>
             <NativeSelectField
               placeholder="All Status"
               value={search?.status}
@@ -199,7 +199,9 @@ const EquipmentPage = () => {
           </Table.Header>
           <Table.Body>
             {equipments?.length ? equipments.slice(offset * limit, (offset + 1) * limit).map((equipment) => (
-              <Table.Row key={equipment.id}>
+              <Table.Row key={equipment.id}
+                // _hover={{ backgroundColor: 'red' }}
+              >
                 <Table.Cell>
                   <IconButton
                     variant="outline"

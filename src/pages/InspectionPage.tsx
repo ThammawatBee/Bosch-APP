@@ -76,10 +76,10 @@ const InspectionPage = () => {
     }
   }
 
-  return <Box>
+  return <Box backgroundColor={'white'} padding="20px" borderRadius={'8px'}>
     <Text color="#3D4D99" fontWeight="bold" textStyle="lg" mb="15px">Inspection List</Text>
     <Box mb="10px">
-      <Field label="Inspection Day" width="18%">
+      <Field label="Inspection Day" width="23%">
         <DatePicker
           dateFormat="dd-MM-yyyy"
           showMonthDropdown
@@ -93,8 +93,8 @@ const InspectionPage = () => {
       </Field>
     </Box>
     <Box mt="10px" display="flex" mb="15px" justifyContent='space-between'>
-      <Field label="Type" width="18%">
-        <NativeSelectRoot background={'white'} borderRadius={'4px'}>
+      <Field label="Type" width="23%">
+        <NativeSelectRoot background={'white'} borderRadius={'8px'}>
           <NativeSelectField
             placeholder="All type"
             value={search?.type}
@@ -108,35 +108,23 @@ const InspectionPage = () => {
           </NativeSelectField>
         </NativeSelectRoot>
       </Field>
-      <Field label="Equipment No." width="18%">
+      <Field label="Equipment No." width="23%">
         <Input
           background={'white'}
           onChange={(e) => {
             setSearch({ equipmentNumber: e.currentTarget.value })
           }} />
       </Field>
-      <Field label="Name" width="18%">
+      <Field label="Name" width="23%">
         <Input background={'white'}
           onChange={(e) => {
             setSearch({ name: e.currentTarget.value })
           }} />
       </Field>
-      <Field label="Brand" width="18%">
+      <Field label="Brand" width="23%">
         <Input background={'white'} onChange={(e) => {
           setSearch({ brand: e.currentTarget.value })
         }} />
-      </Field>
-      <Field label="Status" width="18%">
-        <NativeSelectRoot background={'white'} borderRadius={'4px'}>
-          <NativeSelectField
-            placeholder="All Status"
-            value={search?.status}
-            onChange={(e) => setSearch({ status: e.currentTarget.value })}
-          >
-            <option value={"ENABLE"}>Enable</option>
-            <option value={"DISABLE"}>Disable</option>
-          </NativeSelectField>
-        </NativeSelectRoot>
       </Field>
     </Box>
     <Button variant="solid" size="lg" fontWeight="bold" mb="20px"
