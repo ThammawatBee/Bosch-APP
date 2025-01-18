@@ -25,6 +25,7 @@ const ReportPage = () => {
 
   const [exportLoading, setExportLoading] = useState(false)
   const [uploadLoading, setUploadLoading] = useState(false)
+  const expectedHeaders = ['Result', 'ResultDate', 'Equipment number', 'nokReason', 'Staff name']
 
   const handleExportReport = async () => {
     const apiUrl = `${process.env.REACT_APP_SERVICE_URL}/reports/export`; // Replace with your API endpoint
@@ -55,9 +56,43 @@ const ReportPage = () => {
     }
   }
 
+  const toastUploadFileError = (message: string) => {
+    toast.error(message, {
+      style: { color: '#18181B' },
+      position: "top-right",
+      autoClose: 3500,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  }
+
+  const checkErrorReportUploadHeader = (fileHeaders: string[] | undefined) => {
+    if (!fileHeaders?.length) {
+      return true
+    }
+    const missingHeaders = expectedHeaders.filter(
+      (header) => !fileHeaders.includes(header)
+    );
+
+    if (missingHeaders.length > 0) {
+      return true
+    }
+    return false
+  }
+
 
   const handleUploadFile = (file: File) => {
+    if (file.type !== 'text/csv') {
+      toastUploadFileError('Upload file is not csv type')
+      return
+    }
     setUploadLoading(true)
+    let isUploadError = false
+    let isCheckHeader = false
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
@@ -66,39 +101,60 @@ const ReportPage = () => {
       chunk: async (results, parser) => {
         parser.pause(); // Pause parsing until the current chunk is uploaded
         const data = results.data as unknown as ReportFromFile[]
-        await createReports(data.map(data => ({
-          equipmentNumber: data["Equipment number"],
-          result: data.Result,
-          resultDate: data.ResultDate,
-          nokReason: data.nokReason,
-          investigatedBy: data["Staff name"],
-        })))
-        try {
-          // await uploadChunk(results.data); // Send the chunk to the server
-          parser.resume(); // Resume parsing after successful upload
-        } catch (error) {
-          console.error('Error uploading chunk:', error);
+        const headers = results.meta?.fields
+        if (!isCheckHeader && (!headers?.length || checkErrorReportUploadHeader(headers))) {
+          isUploadError = true
           parser.abort(); // Stop processing further
+          toastUploadFileError(`Please check file upload header file, header is required ${expectedHeaders.join()}`)
+          return
+        }
+        isCheckHeader = true
+        try {
+          await createReports(data.map(data => ({
+            equipmentNumber: data["Equipment number"],
+            result: data.Result,
+            resultDate: data.ResultDate,
+            nokReason: data.nokReason,
+            investigatedBy: data["Staff name"],
+          })).filter(report => report.result))
+          parser.resume(); // Resume parsing after successful upload
+        } catch (error: any) {
+          parser.pause()
+          isUploadError = true
+          parser.abort(); // Stop processing further
+          let errorMessage = ''
+          if (error?.data?.message === 'Validation failed') {
+            errorMessage = 'Upload report fail cause Validation failed'
+          }
+          else {
+            errorMessage = 'Upload report fail please check file upload'
+          }
+          toastUploadFileError(errorMessage)
+          return
         }
       },
       complete: async () => {
-        toast.success('Upload report success', {
-          style: { color: '#18181B' },
-          position: "top-right",
-          autoClose: 3500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        setUploadLoading(false)
-        await resetReportList()
+        if (!isUploadError) {
+          toast.success('Upload report success', {
+            style: { color: '#18181B' },
+            position: "top-right",
+            autoClose: 3500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          setUploadLoading(false)
+          isUploadError = false
+          isCheckHeader = false
+          await resetReportList()
+        }
       },
       error: (error: any) => {
         setUploadLoading(false)
-        console.error('Error parsing CSV:', error);
+        console.log('Error parsing CSV:', error);
       },
     })
   }
