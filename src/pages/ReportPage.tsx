@@ -193,20 +193,24 @@ const ReportPage = () => {
       <Field label="Equipment No." width="18%">
         <Input
           background={'white'}
+          value={search?.equipmentNumber}
           onChange={(e) => {
             setSearch({ equipmentNumber: e.currentTarget.value })
           }} />
       </Field>
       <Field label="Name" width="18%">
         <Input background={'white'}
+          value={search?.name}
           onChange={(e) => {
             setSearch({ name: e.currentTarget.value })
           }} />
       </Field>
       <Field label="Brand" width="18%">
-        <Input background={'white'} onChange={(e) => {
-          setSearch({ brand: e.currentTarget.value })
-        }} />
+        <Input background={'white'}
+         value={search?.brand}
+          onChange={(e) => {
+            setSearch({ brand: e.currentTarget.value })
+          }} />
       </Field>
     </Box>
     <Box mt="10px" display="flex" mb="15px" justifyContent='space-between'>

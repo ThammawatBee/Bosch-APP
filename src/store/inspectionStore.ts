@@ -40,6 +40,7 @@ const useInspectionEquipmentStore = create<InspectionState>()(
     offset: 0,
     limit: 10,
     inspectDate: new Date(),
+    search: {},
 
     fetchInspectionEquipments: async (options?: { limit?: number, offset?: number, reset?: boolean, changePage?: boolean }) => {
       set({ isLoading: true, error: null });

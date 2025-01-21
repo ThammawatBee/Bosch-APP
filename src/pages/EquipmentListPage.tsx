@@ -76,7 +76,6 @@ const EquipmentPage = () => {
       setExportLoading(false)
     }
   }
-
   return <Box backgroundColor={'white'} padding="20px" borderRadius={'8px'}>
     <Box>
       <Text color="#3D4D99" fontWeight="bold" textStyle="lg" mb="15px">Equipment List</Text>
@@ -87,7 +86,6 @@ const EquipmentPage = () => {
               placeholder="All type"
               value={search?.type}
               onChange={(e) => {
-                console.log('e.currentTarget.value', e.currentTarget.value)
                 setSearch({ type: e.currentTarget.value })
               }}
               name="type"
@@ -200,7 +198,7 @@ const EquipmentPage = () => {
           <Table.Body>
             {equipments?.length ? equipments.slice(offset * limit, (offset + 1) * limit).map((equipment) => (
               <Table.Row key={equipment.id}
-                // _hover={{ backgroundColor: 'red' }}
+              // _hover={{ backgroundColor: 'red' }}
               >
                 <Table.Cell>
                   <IconButton
