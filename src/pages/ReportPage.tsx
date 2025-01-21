@@ -116,7 +116,7 @@ const ReportPage = () => {
             resultDate: data.ResultDate,
             nokReason: data.nokReason,
             investigatedBy: data["Staff name"],
-          })).filter(report => report.result))
+          })).filter(report => report.result && report.resultDate))
           parser.resume(); // Resume parsing after successful upload
         } catch (error: any) {
           parser.pause()
