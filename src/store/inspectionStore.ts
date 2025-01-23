@@ -11,6 +11,7 @@ type InspectionSearch = {
   name?: string
   brand?: string
   status?: string
+  area?: string
 }
 
 interface InspectionState {

@@ -7,6 +7,7 @@ export interface CreateEquipmentFormValues {
   inspectionPeriod: number
   expiredDate: string
   status: string
+  area: string
 }
 
 export interface EditEquipmentFormValues {
@@ -17,6 +18,7 @@ export interface EditEquipmentFormValues {
   status: string,
   equipmentNumber: string
   inspectionPeriod: number
+  area: string
 }
 
 export interface Equipment {
@@ -29,6 +31,8 @@ export interface Equipment {
   inspectionPeriod: number
   expiredDate: string
   status: string
+  area: string
+  daysUntilInspection: string
 }
 
 export interface ListEquipmentOptions {

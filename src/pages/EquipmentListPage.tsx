@@ -170,7 +170,14 @@ const EquipmentPage = () => {
               background={'white'} />}
           />
         </Field>
-        <Box width="59%" />
+        <Field label="Area" width="18%">
+          <Input background={'white'}
+            value={search.area}
+            onChange={(e) => {
+              setSearch({ area: e.currentTarget.value })
+            }} />
+        </Field>
+        <Box width="38%" />
       </Box>
       <Button variant="solid" size="lg" fontWeight="bold" mb="20px"
         onClick={async () => {
@@ -191,6 +198,7 @@ const EquipmentPage = () => {
               <Table.ColumnHeader>Inspection Period</Table.ColumnHeader>
               <Table.ColumnHeader>Next Inspection</Table.ColumnHeader>
               <Table.ColumnHeader>Expired Date</Table.ColumnHeader>
+              <Table.ColumnHeader>Area</Table.ColumnHeader>
               <Table.ColumnHeader>Status</Table.ColumnHeader>
               <Table.ColumnHeader></Table.ColumnHeader>
             </Table.Row>
@@ -218,6 +226,7 @@ const EquipmentPage = () => {
                 <Table.Cell>{equipment.inspectionPeriod} Month</Table.Cell>
                 <Table.Cell>{DateTime.fromISO(equipment.nextInspection).toFormat('dd-MM-yyyy')}</Table.Cell>
                 <Table.Cell>{DateTime.fromISO(equipment.expiredDate).toFormat('dd-MM-yyyy')}</Table.Cell>
+                <Table.Cell>{equipment.area || ''}</Table.Cell>
                 <Table.Cell>{equipment.status}</Table.Cell>
                 <Table.Cell>
                   <IconButton

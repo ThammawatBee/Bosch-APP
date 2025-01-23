@@ -175,20 +175,13 @@ const ReportPage = () => {
           </NativeSelectField>
         </NativeSelectRoot>
       </Field>
-      <Field label="Type" width="18%">
-        <NativeSelectRoot background={'white'} borderRadius={'8px'}>
-          <NativeSelectField
-            placeholder="All type"
-            value={search?.type}
-            onChange={(e) => {
-              setSearch({ type: e.currentTarget.value })
-            }}
-            name="type"
-          >
-            <option value="BOSCH">Bosch</option>
-            <option value="EXTERNAL">External</option>
-          </NativeSelectField>
-        </NativeSelectRoot>
+      <Field label="Area" width="18%">
+        <Input
+          background={'white'}
+          value={search?.area}
+          onChange={(e) => {
+            setSearch({ area: e.currentTarget.value })
+          }} />
       </Field>
       <Field label="Equipment No." width="18%">
         <Input
@@ -207,7 +200,7 @@ const ReportPage = () => {
       </Field>
       <Field label="Brand" width="18%">
         <Input background={'white'}
-         value={search?.brand}
+          value={search?.brand}
           onChange={(e) => {
             setSearch({ brand: e.currentTarget.value })
           }} />
@@ -247,9 +240,10 @@ const ReportPage = () => {
         <Table.Header>
           <Table.Row background={"#F6F6F6"}>
             <Table.ColumnHeader>Result</Table.ColumnHeader>
-            <Table.ColumnHeader>Type</Table.ColumnHeader>
             <Table.ColumnHeader>Result Date</Table.ColumnHeader>
             <Table.ColumnHeader>Staff Name</Table.ColumnHeader>
+            <Table.ColumnHeader>Area</Table.ColumnHeader>
+            <Table.ColumnHeader>Type</Table.ColumnHeader>
             <Table.ColumnHeader>Equipment No.</Table.ColumnHeader>
             <Table.ColumnHeader>Name</Table.ColumnHeader>
             <Table.ColumnHeader>Brand</Table.ColumnHeader>
@@ -262,9 +256,10 @@ const ReportPage = () => {
         <Table.Body>
           {reports?.length ? reports.map(report => <Table.Row>
             <Table.Cell color={report.result === 'NOK' ? '#DA695D' : 'black'}>{report.result}</Table.Cell>
-            <Table.Cell>{report.type}</Table.Cell>
             <Table.Cell>{DateTime.fromISO(report.resultDate).toFormat('dd-MM-yyyy')}</Table.Cell>
             <Table.Cell>{report.investigatedBy || ''}</Table.Cell>
+            <Table.Cell>{report.area || ''}</Table.Cell>
+            <Table.Cell>{report.type}</Table.Cell>
             <Table.Cell>{report.equipmentNumber}</Table.Cell>
             <Table.Cell>{report.name}</Table.Cell>
             <Table.Cell>{report.brand}</Table.Cell>

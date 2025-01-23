@@ -16,6 +16,7 @@ type EquipmentSearch = {
   inspectionDayEnd?: Date
   expiredDayStart?: Date
   expiredDayEnd?: Date
+  area?: string
 }
 
 interface EquipmentState {

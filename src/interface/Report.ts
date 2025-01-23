@@ -28,4 +28,5 @@ export interface EquipmentReport {
   equipmentId: string
   nokReason: string
   investigatedBy?: string
+  area?: string
 }

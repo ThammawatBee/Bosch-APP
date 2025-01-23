@@ -48,6 +48,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
       type: 'BOSCH',
       brand: '',
       name: '',
+      area: '',
       nextInspection: "",
       inspectionPeriod: 0,
       expiredDate: "",
@@ -59,6 +60,13 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
       name: Yup.string().required('Name is required.'),
       inspectionPeriod: Yup.number().nullable().required("Inspection period is required."),
       nextInspection: Yup.string().required("Next Inspection is required."),
+      area: Yup.string().test("Requied", "Area is required.", function (value) {
+        const { type } = this.parent;
+        if (type && type === 'BOSCH') {
+          return !!value
+        }
+        return true
+      }),
       expiredDate: Yup.string().required("Expired date is required.")
         .test("isValidDate", "Invalid date", (value) => {
           const parsedDate = DateTime.fromFormat(value, "dd-MM-yyyy");
@@ -66,13 +74,13 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
         })
         .test(
           "isAfterNextInspection",
-          "Expired date must be after Next inspection date",
+          "Expired date must be equal or after Next inspection date",
           function (value) {
             const { nextInspection } = this.parent;
             if (!nextInspection) {
               return true
             }
-            return value && DateTime.fromFormat(value, "dd-MM-yyyy") > DateTime.fromFormat(nextInspection, "dd-MM-yyyy")
+            return value && DateTime.fromFormat(value, "dd-MM-yyyy") >= DateTime.fromFormat(nextInspection, "dd-MM-yyyy")
           }
         ),
     }),
@@ -86,17 +94,17 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
             expiredDate: value.expiredDate,
             inspectionPeriod: +value.inspectionPeriod,
             status: value.status,
-            equipmentNumber: `${getEquipmentNumberPrefix()}${value.equipmentNumber}`
+            equipmentNumber: `${getEquipmentNumberPrefix()}${value.equipmentNumber}`,
+            area: value.area,
           })
           successToast("Edit equipment success")
         } else {
-          await createEquipment({ ...value, equipmentNumber: `${getEquipmentNumberPrefix()}${value.equipmentNumber}` })
+          await createEquipment({ ...value, inspectionPeriod: +value.inspectionPeriod, equipmentNumber: `${getEquipmentNumberPrefix()}${value.equipmentNumber}` })
           successToast("Create equipment success")
         }
         setOpenDialog(false)
       } catch (error: any) {
         const errorData = error.data as ServiceError
-        console.log('errorData.errorKey', errorData.errorKey)
         if (errorData.errorKey === 'EQUIPMENT_NUMBER_IS_ALREADY_EXIST') {
           toast.error('Equipment number is already exist', {
             style: { color: '#18181B' },
@@ -149,7 +157,8 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
         nextInspection: DateTime.fromISO(selectedEquipment.nextInspection).toFormat("dd-MM-yyyy"),
         inspectionPeriod: selectedEquipment.inspectionPeriod,
         expiredDate: DateTime.fromISO(selectedEquipment.expiredDate).toFormat("dd-MM-yyyy"),
-        status: selectedEquipment.status
+        status: selectedEquipment.status,
+        area: selectedEquipment.area,
       })
       setSelectedDate(DateTime.fromISO(selectedEquipment.expiredDate).toJSDate())
     }
@@ -186,6 +195,15 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
                           formik.setFieldTouched("inspectionPeriod", false)
                           formik.setFieldTouched("nextInspection", false)
                         }
+                      }
+                      if (e.currentTarget.value === "EXTERNAL") {
+                        const expiredDate = DateTime.now().plus({ months: Number(3) }).minus({ days: 1 })
+                        setSelectedDate(expiredDate.toJSDate())
+                        formik.setFieldValue("expiredDate", expiredDate.toFormat("dd-MM-yyyy"))
+                        if (formik.errors.expiredDate) {
+                          formik.setFieldTouched("expiredDate", false)
+                        }
+                        formik.setFieldValue("area", "")
                       }
                     }
                   }}
@@ -226,6 +244,14 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
                       formik.setFieldTouched("inspectionPeriod", false)
                       formik.setFieldTouched("nextInspection", false)
                     }
+                    if (formik.values.type === "EXTERNAL") {
+                      const expiredDate = DateTime.now().plus({ months: Number(e.currentTarget.value) }).minus({ days: 1 })
+                      setSelectedDate(expiredDate.toJSDate())
+                      formik.setFieldValue("expiredDate", expiredDate.toFormat("dd-MM-yyyy"))
+                      if (formik.errors.expiredDate) {
+                        formik.setFieldTouched("expiredDate", false)
+                      }
+                    }
                   }
                 }}
                 name="inspectionPeriod"
@@ -247,6 +273,7 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
               selected={selectedDate}
               showMonthDropdown
               showYearDropdown
+              disabled={formik.values.type === "EXTERNAL"}
               onChange={(date) => {
                 setSelectedDate(date)
                 if (!date) {
@@ -256,11 +283,14 @@ const EquipmentFormDialog = ({ isOpenDialog, setOpenDialog, selectedEquipment }:
                     formik.setFieldValue("expiredDate", DateTime.fromJSDate(date).toFormat("dd-MM-yyyy"))
                   }
                 }
-                // formik.setFieldValue("expiredDate", DateTime.fromJSDate(date).)
               }}
-              customInput={<Input readOnly />}
+              customInput={<Input readOnly disabled={formik.values.type === "EXTERNAL"} variant={formik.values.type === "EXTERNAL" ? "subtle" : "outline"} />}
             />
           </Field>
+          {formik.values.type === "BOSCH" ?
+            <Field label="Area" marginBottom={'10px'} invalid={!!formik.touched.area && !!formik.errors.area} errorText={formik.errors.area}>
+              <Input value={formik?.values?.area} onBlur={formik.handleBlur} onChange={e => { formik.setFieldValue("area", e.currentTarget.value) }} />
+            </Field> : null}
           <Field label="Status" marginBottom={'10px'}>
             <NativeSelectRoot disabled={!!selectedEquipment}>
               <NativeSelectField

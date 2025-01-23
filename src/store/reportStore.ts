@@ -14,6 +14,7 @@ type ReportSearch = {
   resultDateStart?: Date
   resultDateEnd?: Date
   status?: string
+  area?: string
 }
 
 

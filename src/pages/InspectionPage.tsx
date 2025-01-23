@@ -26,6 +26,12 @@ const InspectionPage = () => {
     const diff = DateTime.fromISO(equipment.nextInspection).diff(DateTime.fromJSDate(inspectDate), 'days').toObject().days!
     return diff > 0 ? Math.ceil(diff) : Math.ceil(diff)
   }
+
+  const changeDaysUntilInspectionToNumber = (daysUntilInspection: string) => {
+    const day = +daysUntilInspection
+    return day > 0 ? Math.ceil(day) : Math.ceil(day)
+  }
+
   const getCurrentEquipmentNo = (equipment: Equipment) => {
     return `${DateTime.fromJSDate(inspectDate).toFormat('ddMMyy')}-${equipment.equipmentNumber.split('-')[1]}`
   }
@@ -92,20 +98,13 @@ const InspectionPage = () => {
       </Field>
     </Box>
     <Box mt="10px" display="flex" mb="15px" justifyContent='space-between'>
-      <Field label="Type" width="23%">
-        <NativeSelectRoot background={'white'} borderRadius={'8px'}>
-          <NativeSelectField
-            placeholder="All type"
-            value={search?.type}
-            onChange={(e) => {
-              setSearch({ type: e.currentTarget.value })
-            }}
-            name="type"
-          >
-            <option value="BOSCH">Bosch</option>
-            <option value="EXTERNAL">External</option>
-          </NativeSelectField>
-        </NativeSelectRoot>
+      <Field label="Area" width="23%">
+        <Input
+          background={'white'}
+          value={search.area}
+          onChange={(e) => {
+            setSearch({ area: e.currentTarget.value })
+          }} />
       </Field>
       <Field label="Equipment No." width="23%">
         <Input
@@ -142,6 +141,7 @@ const InspectionPage = () => {
         <Table.Header>
           <Table.Row background={"#F6F6F6"}>
             <Table.ColumnHeader>Remaining Days</Table.ColumnHeader>
+            <Table.ColumnHeader>Area</Table.ColumnHeader>
             <Table.ColumnHeader>Type</Table.ColumnHeader>
             <Table.ColumnHeader>New Equipment No.</Table.ColumnHeader>
             <Table.ColumnHeader>Current Equipment No.</Table.ColumnHeader>
@@ -160,7 +160,8 @@ const InspectionPage = () => {
                 color: '#EE5153',
               } : {}
             }}>
-              <Table.Cell>{calculateDateDifferent(equipment)}</Table.Cell>
+              <Table.Cell>{changeDaysUntilInspectionToNumber(equipment.daysUntilInspection)}</Table.Cell>
+              <Table.Cell>{equipment.area || ''}</Table.Cell>
               <Table.Cell>{equipment.type}</Table.Cell>
               <Table.Cell>{getCurrentEquipmentNo(equipment)}</Table.Cell>
               <Table.Cell>{equipment.equipmentNumber}</Table.Cell>
